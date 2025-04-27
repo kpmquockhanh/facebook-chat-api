@@ -5,7 +5,7 @@ var log = require("npmlog");
 var mqtt = require('mqtt');
 var websocket = require('websocket-stream');
 
-var identity = function () {};
+var identity = function() { };
 
 //Don't really know what this does but I think it's for the active state
 //TODO: Move to ctx when implemented
@@ -96,11 +96,11 @@ function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
       entity_fbid: ctx.userID,
     };
 
-    if(ctx.globalOptions.pageID) {
+    if (ctx.globalOptions.pageID) {
       queue.entity_fbid = ctx.globalOptions.pageID;
     }
 
-    if(ctx.syncToken) {
+    if (ctx.syncToken) {
       topic = "/messenger_sync_get_diffs";
       queue.last_seq_id = ctx.lastSeqId;
       queue.sync_token = ctx.syncToken;
@@ -109,23 +109,23 @@ function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
       queue.initial_titan_sequence_id = ctx.lastSeqId;
       queue.device_params = null;
     }
-    
-    mqttClient.publish(topic, JSON.stringify(queue), {qos: 1, retain: false});
+
+    mqttClient.publish(topic, JSON.stringify(queue), { qos: 1, retain: false });
   });
 
   mqttClient.on('message', function(topic, message, packet) {
     var jsonMessage = JSON.parse(message);
-    if(topic === "/t_ms") {
-      if(jsonMessage.firstDeltaSeqId && jsonMessage.syncToken) {
+    if (topic === "/t_ms") {
+      if (jsonMessage.firstDeltaSeqId && jsonMessage.syncToken) {
         ctx.lastSeqId = jsonMessage.firstDeltaSeqId;
         ctx.syncToken = jsonMessage.syncToken;
       }
 
-      if(jsonMessage.lastIssuedSeqId) {
+      if (jsonMessage.lastIssuedSeqId) {
         ctx.lastSeqId = parseInt(jsonMessage.lastIssuedSeqId);
       }
 
-      if(jsonMessage.queueEntityId && ctx.globalOptions.pageID &&
+      if (jsonMessage.queueEntityId && ctx.globalOptions.pageID &&
         ctx.globalOptions.pageID != jsonMessage.queueEntityId) {
         return;
       }
@@ -142,7 +142,7 @@ function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
         from: jsonMessage.sender_fbid.toString(),
         threadID: utils.formatID((jsonMessage.thread || jsonMessage.sender_fbid).toString())
       };
-      (function () { globalCallback(null, typ); })();
+      (function() { globalCallback(null, typ); })();
     } else if (topic === "/orca_presence") {
       if (!ctx.globalOptions.updatePresence) {
         for (var i in jsonMessage.list) {
@@ -156,7 +156,7 @@ function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
             timestamp: data["l"] * 1000,
             statuses: data["p"]
           };
-          (function () { globalCallback(null, presence); })();
+          (function() { globalCallback(null, presence); })();
         }
       }
     }
@@ -169,7 +169,7 @@ function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
 }
 
 function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
-  if(v.delta.class == "NewMessage") {
+  if (v.delta.class == "NewMessage") {
     (function resolveAttachmentUrl(i) {
       // sometimes, with sticker message in group, delta does not contain 'attachments' property.
       if (v.delta.attachments && (i == v.delta.attachments.length)) {
@@ -192,7 +192,7 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
         return !ctx.globalOptions.selfListen &&
           fmtMsg.senderID === ctx.userID ?
           undefined :
-          (function () { globalCallback(null, fmtMsg); })();
+          (function() { globalCallback(null, fmtMsg); })();
       } else {
         if (
           v.delta.attachments && (v.delta.attachments[i].mercury.attach_type == "photo")
@@ -222,28 +222,32 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
       for (var i in clientPayload.deltas) {
         var delta = clientPayload.deltas[i];
         if (delta.deltaMessageReaction && !!ctx.globalOptions.listenEvents) {
-          (function () { globalCallback(null, {
-            type: "message_reaction",
-            threadID: (delta.deltaMessageReaction.threadKey
-              .threadFbId ?
-              delta.deltaMessageReaction.threadKey.threadFbId : delta.deltaMessageReaction.threadKey
-                .otherUserFbId).toString(),
-            messageID: delta.deltaMessageReaction.messageId,
-            reaction: delta.deltaMessageReaction.reaction,
-            senderID: delta.deltaMessageReaction.senderId.toString(),
-            userID: delta.deltaMessageReaction.userId.toString()
-          }); })();
+          (function() {
+            globalCallback(null, {
+              type: "message_reaction",
+              threadID: (delta.deltaMessageReaction.threadKey
+                .threadFbId ?
+                delta.deltaMessageReaction.threadKey.threadFbId : delta.deltaMessageReaction.threadKey
+                  .otherUserFbId).toString(),
+              messageID: delta.deltaMessageReaction.messageId,
+              reaction: delta.deltaMessageReaction.reaction,
+              senderID: delta.deltaMessageReaction.senderId.toString(),
+              userID: delta.deltaMessageReaction.userId.toString()
+            });
+          })();
         } else if (delta.deltaRecallMessageData && !!ctx.globalOptions.listenEvents) {
-          (function () { globalCallback(null, {
-            type: "message_unsend",
-            threadID: (delta.deltaRecallMessageData.threadKey.threadFbId ?
-              delta.deltaRecallMessageData.threadKey.threadFbId : delta.deltaRecallMessageData.threadKey
-                .otherUserFbId).toString(),
-            messageID: delta.deltaRecallMessageData.messageID,
-            senderID: delta.deltaRecallMessageData.senderID.toString(),
-            deletionTimestamp: delta.deltaRecallMessageData.deletionTimestamp,
-            timestamp: delta.deltaRecallMessageData.timestamp
-          }); })();
+          (function() {
+            globalCallback(null, {
+              type: "message_unsend",
+              threadID: (delta.deltaRecallMessageData.threadKey.threadFbId ?
+                delta.deltaRecallMessageData.threadKey.threadFbId : delta.deltaRecallMessageData.threadKey
+                  .otherUserFbId).toString(),
+              messageID: delta.deltaRecallMessageData.messageID,
+              senderID: delta.deltaRecallMessageData.senderID.toString(),
+              deletionTimestamp: delta.deltaRecallMessageData.deletionTimestamp,
+              timestamp: delta.deltaRecallMessageData.timestamp
+            });
+          })();
         } else if (delta.deltaMessageReply) {
           //Mention block - #1
           var mdata =
@@ -271,7 +275,7 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
                 .otherUserFbId).toString(),
             messageID: delta.deltaMessageReply.message.messageMetadata.messageId,
             senderID: delta.deltaMessageReply.message.messageMetadata.actorFbId.toString(),
-            attachments: delta.deltaMessageReply.message.attachments.map(function (att) {
+            attachments: delta.deltaMessageReply.message.attachments.map(function(att) {
               var mercury = JSON.parse(att.mercuryJSON);
               Object.assign(att, mercury);
               return att;
@@ -318,7 +322,7 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
                   .otherUserFbId).toString(),
               messageID: delta.deltaMessageReply.repliedToMessage.messageMetadata.messageId,
               senderID: delta.deltaMessageReply.repliedToMessage.messageMetadata.actorFbId.toString(),
-              attachments: delta.deltaMessageReply.repliedToMessage.attachments.map(function (att) {
+              attachments: delta.deltaMessageReply.repliedToMessage.attachments.map(function(att) {
                 var mercury = JSON.parse(att.mercuryJSON);
                 Object.assign(att, mercury);
                 return att;
@@ -347,7 +351,7 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
           return !ctx.globalOptions.selfListen &&
             callbackToReturn.senderID === ctx.userID ?
             undefined :
-            (function () { globalCallback(null, callbackToReturn); })();
+            (function() { globalCallback(null, callbackToReturn); })();
         }
       }
       return;
@@ -372,7 +376,7 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
           type: "parse_error"
         });
       }
-      return (function () { globalCallback(null, fmtMsg); })();
+      return (function() { globalCallback(null, fmtMsg); })();
     case "AdminTextMessage":
       switch (v.delta.type) {
         case "change_thread_theme":
@@ -391,7 +395,7 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
               type: "parse_error"
             });
           }
-          return (function () { globalCallback(null, fmtMsg); })();
+          return (function() { globalCallback(null, fmtMsg); })();
         default:
           return;
       }
@@ -436,19 +440,21 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
                 fetchData.message_sender.id.toString() === ctx.userID) ||
                 !ctx.loggedIn ?
                 undefined :
-                (function () { globalCallback(null, {
-                  type: "change_thread_image",
-                  threadID: utils.formatID(tid.toString()),
-                  snippet: fetchData.snippet,
-                  timestamp: fetchData.timestamp_precise,
-                  author: fetchData.message_sender.id,
-                  image: {
-                    attachmentID: fetchData.image_with_metadata && fetchData.image_with_metadata.legacy_attachment_id,
-                    width: fetchData.image_with_metadata && fetchData.image_with_metadata.original_dimensions.x,
-                    height: fetchData.image_with_metadata && fetchData.image_with_metadata.original_dimensions.y,
-                    url: fetchData.image_with_metadata && fetchData.image_with_metadata.preview.uri
-                  }
-                }); })();
+                (function() {
+                  globalCallback(null, {
+                    type: "change_thread_image",
+                    threadID: utils.formatID(tid.toString()),
+                    snippet: fetchData.snippet,
+                    timestamp: fetchData.timestamp_precise,
+                    author: fetchData.message_sender.id,
+                    image: {
+                      attachmentID: fetchData.image_with_metadata && fetchData.image_with_metadata.legacy_attachment_id,
+                      width: fetchData.image_with_metadata && fetchData.image_with_metadata.original_dimensions.x,
+                      height: fetchData.image_with_metadata && fetchData.image_with_metadata.original_dimensions.y,
+                      url: fetchData.image_with_metadata && fetchData.image_with_metadata.preview.uri
+                    }
+                  });
+                })();
             }
           })
           .catch((err) => {
@@ -474,7 +480,7 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
         formattedEvent.author.toString() === ctx.userID) ||
         !ctx.loggedIn ?
         undefined :
-        (function () { globalCallback(null, formattedEvent); })();
+        (function() { globalCallback(null, formattedEvent); })();
   }
 }
 
@@ -496,9 +502,9 @@ function markDelivery(ctx, api, threadID, messageID) {
   }
 }
 
-module.exports = function (defaultFuncs, api, ctx) {
+module.exports = function(defaultFuncs, api, ctx) {
   var globalCallback = identity;
-  return function (callback) {
+  return function(callback) {
     globalCallback = callback;
 
     //Reset some stuff
@@ -526,6 +532,9 @@ module.exports = function (defaultFuncs, api, ctx) {
       .post("https://www.facebook.com/api/graphqlbatch/", ctx.jar, form)
       .then(utils.parseAndCheckLogin(ctx, defaultFuncs))
       .then((resData) => {
+        if (resData.error) {
+          throw resData.errorDescription;
+        }
         if (resData && resData.length > 0 && resData[resData.length - 1].error_results > 0) {
           throw resData[0].o0.errors;
         }
@@ -536,6 +545,7 @@ module.exports = function (defaultFuncs, api, ctx) {
 
         if (resData[0].o0.data.viewer.message_threads.sync_sequence_id) {
           ctx.lastSeqId = resData[0].o0.data.viewer.message_threads.sync_sequence_id;
+          log.info('listenMqtt', 'Start listening mqtt')
           listenMqtt(defaultFuncs, api, ctx, globalCallback);
         }
 
@@ -545,11 +555,10 @@ module.exports = function (defaultFuncs, api, ctx) {
         return callback(err);
       });
 
-    var stopListening = function () {
+    var stopListening = function() {
       globalCallback = identity;
 
-      if(ctx.mqttClient)
-      {
+      if (ctx.mqttClient) {
         ctx.mqttClient.end();
         ctx.mqttClient = undefined;
       }

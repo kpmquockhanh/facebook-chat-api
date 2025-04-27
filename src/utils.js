@@ -1,7 +1,7 @@
 "use strict";
 
 var bluebird = require("bluebird");
-var request = bluebird.promisify(require("request").defaults({ jar: true }), {multiArgs: true});
+var request = bluebird.promisify(require("request").defaults({ jar: true }), { multiArgs: true });
 var stream = require("stream");
 var log = require("npmlog");
 
@@ -570,12 +570,12 @@ function _formatAttachment(attachment1, attachment2) {
     default:
       throw new Error(
         "unrecognized attach_file of type " +
-          type +
-          "`" +
-          JSON.stringify(attachment1, null, 4) +
-          " attachment2: " +
-          JSON.stringify(attachment2, null, 4) +
-          "`"
+        type +
+        "`" +
+        JSON.stringify(attachment1, null, 4) +
+        " attachment2: " +
+        JSON.stringify(attachment2, null, 4) +
+        "`"
       );
   }
 }
@@ -584,15 +584,15 @@ function formatAttachment(attachments, attachmentIds, attachmentMap, shareMap) {
   attachmentMap = shareMap || attachmentMap;
   return attachments
     ? attachments.map(function(val, i) {
-        if (
-          !attachmentMap ||
-          !attachmentIds ||
-          !attachmentMap[attachmentIds[i]]
-        ) {
-          return _formatAttachment(val);
-        }
-        return _formatAttachment(val, attachmentMap[attachmentIds[i]]);
-      })
+      if (
+        !attachmentMap ||
+        !attachmentIds ||
+        !attachmentMap[attachmentIds[i]]
+      ) {
+        return _formatAttachment(val);
+      }
+      return _formatAttachment(val, attachmentMap[attachmentIds[i]]);
+    })
     : [];
 }
 
@@ -650,8 +650,8 @@ function formatMessage(m) {
       : [originalMessage.sender_name.split(" ")[0]],
     participantIDs: originalMessage.group_thread_info
       ? originalMessage.group_thread_info.participant_ids.map(function(v) {
-          return formatID(v.toString());
-        })
+        return formatID(v.toString());
+      })
       : [formatID(originalMessage.sender_fbid)],
     body: originalMessage.body || "",
     threadID: formatID(
@@ -972,7 +972,7 @@ function makeDefaults(html, userID, ctx) {
       jar,
       mergeWithDefaults(form),
       mergeWithDefaults(qs),
-      ctx.globalOptions 
+      ctx.globalOptions
     );
   }
 
@@ -1004,18 +1004,20 @@ function parseAndCheckLogin(ctx, defaultFuncs, retryCount) {
         log.warn(
           "parseAndCheckLogin",
           "Got status code " +
-            data.statusCode +
-            " - " +
-            retryCount +
-            ". attempt to retry in " +
-            retryTime +
-            " milliseconds..."
+          data.statusCode +
+          " - " +
+          retryCount +
+          ". attempt to retry in " +
+          retryTime +
+          " milliseconds..."
         );
         var url =
           data.request.uri.protocol +
           "//" +
           data.request.uri.hostname +
           data.request.uri.pathname;
+        log.warn('TTTTT', 'Debug url: ', url);
+
         if (
           data.request.headers["Content-Type"].split(";")[0] ===
           "multipart/form-data"
@@ -1043,8 +1045,8 @@ function parseAndCheckLogin(ctx, defaultFuncs, retryCount) {
       if (data.statusCode !== 200)
         throw new Error(
           "parseAndCheckLogin got status code: " +
-            data.statusCode +
-            ". Bailing out of trying to parse response."
+          data.statusCode +
+          ". Bailing out of trying to parse response."
         );
 
       var res = null;

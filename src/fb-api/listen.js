@@ -4,7 +4,7 @@ var utils = require("../utils");
 var log = require("npmlog");
 
 var msgsRecv = 0;
-var identity = function() {};
+var identity = function() { };
 
 module.exports = function(defaultFuncs, api, ctx) {
   var currentlyRunning = null;
@@ -64,7 +64,7 @@ module.exports = function(defaultFuncs, api, ctx) {
         }
         globalCallback(null, fmtMsg);
         return true;
-        // "read event" triggers when the user read other people's messages.
+      // "read event" triggers when the user read other people's messages.
       case "read":
         var fmtMsg;
         try {
@@ -85,7 +85,7 @@ module.exports = function(defaultFuncs, api, ctx) {
     }
   }
 
-  var serverNumber = "0";
+  var serverNumber = "4";
 
   function listen(servern) {
     if (currentlyRunning == null || !ctx.loggedIn) {
@@ -99,6 +99,7 @@ module.exports = function(defaultFuncs, api, ctx) {
       "presence=" + presence + "; path=/; domain=.facebook.com; secure",
       "https://www.facebook.com"
     );
+    log.info('fetch', "https://" + serverNumber + "-edge-chat.facebook.com/pull")
     defaultFuncs
       .get(
         "https://" + serverNumber + "-edge-chat.facebook.com/pull",
@@ -293,7 +294,7 @@ module.exports = function(defaultFuncs, api, ctx) {
                             threadID: delta.deltaMessageReaction.threadKey
                               .threadFbId ?
                               delta.deltaMessageReaction.threadKey.threadFbId : delta.deltaMessageReaction.threadKey
-                              .otherUserFbId,
+                                .otherUserFbId,
                             messageID: delta.deltaMessageReaction.messageId,
                             reaction: delta.deltaMessageReaction.reaction,
                             senderID: delta.deltaMessageReaction.senderId,
@@ -305,7 +306,7 @@ module.exports = function(defaultFuncs, api, ctx) {
                             type: "message_unsend",
                             threadID: delta.deltaRecallMessageData.threadKey.threadFbId ?
                               delta.deltaRecallMessageData.threadKey.threadFbId : delta.deltaRecallMessageData.threadKey
-                              .otherUserFbId,
+                                .otherUserFbId,
                             messageID: delta.deltaRecallMessageData.messageID,
                             senderID: delta.deltaRecallMessageData.senderID,
                             deletionTimestamp: delta.deltaRecallMessageData.deletionTimestamp,
@@ -315,8 +316,8 @@ module.exports = function(defaultFuncs, api, ctx) {
                           //Mention block - #1
                           var mdata =
                             delta.deltaMessageReply.message.data === undefined ? [] :
-                            delta.deltaMessageReply.message.data.prng === undefined ? [] :
-                            JSON.parse(delta.deltaMessageReply.message.data.prng);
+                              delta.deltaMessageReply.message.data.prng === undefined ? [] :
+                                JSON.parse(delta.deltaMessageReply.message.data.prng);
                           var m_id = mdata.map(u => u.i);
                           var m_offset = mdata.map(u => u.o);
                           var m_length = mdata.map(u => u.l);
@@ -333,8 +334,8 @@ module.exports = function(defaultFuncs, api, ctx) {
                           //Mention block - #2
                           var mdata =
                             delta.deltaMessageReply.repliedToMessage.data === undefined ? [] :
-                            delta.deltaMessageReply.repliedToMessage.data.prng === undefined ? [] :
-                            JSON.parse(delta.deltaMessageReply.repliedToMessage.data.prng);
+                              delta.deltaMessageReply.repliedToMessage.data.prng === undefined ? [] :
+                                JSON.parse(delta.deltaMessageReply.repliedToMessage.data.prng);
                           var m_id = mdata.map(u => u.i);
                           var m_offset = mdata.map(u => u.o);
                           var m_length = mdata.map(u => u.l);
@@ -353,7 +354,7 @@ module.exports = function(defaultFuncs, api, ctx) {
                             type: "message_reply",
                             threadID: delta.deltaMessageReply.message.messageMetadata.threadKey.threadFbId ?
                               delta.deltaMessageReply.message.messageMetadata.threadKey.threadFbId : delta.deltaMessageReply.message.messageMetadata.threadKey
-                              .otherUserFbId,
+                                .otherUserFbId,
                             messageID: delta.deltaMessageReply.message.messageMetadata.messageId,
                             senderID: delta.deltaMessageReply.message.messageMetadata.actorFbId,
                             attachments: delta.deltaMessageReply.message.attachments.map(function(att) {
@@ -368,7 +369,7 @@ module.exports = function(defaultFuncs, api, ctx) {
                             messageReply: {
                               threadID: delta.deltaMessageReply.repliedToMessage.messageMetadata.threadKey.threadFbId ?
                                 delta.deltaMessageReply.repliedToMessage.messageMetadata.threadKey.threadFbId : delta.deltaMessageReply.repliedToMessage.messageMetadata.threadKey
-                                .otherUserFbId,
+                                  .otherUserFbId,
                               messageID: delta.deltaMessageReply.repliedToMessage.messageMetadata.messageId,
                               senderID: delta.deltaMessageReply.repliedToMessage.messageMetadata.actorFbId,
                               attachments: delta.deltaMessageReply.repliedToMessage.attachments.map(function(att) {
@@ -428,25 +429,25 @@ module.exports = function(defaultFuncs, api, ctx) {
                         default:
                           return;
                       }
-                      case "ThreadName":
-                      case "ParticipantsAddedToGroupThread":
-                      case "ParticipantLeftGroupThread":
-                        var formattedEvent;
-                        try {
-                          formattedEvent = utils.formatDeltaEvent(v.delta);
-                        } catch (err) {
-                          return globalCallback({
-                            error: "Problem parsing message object. Please open an issue at https://github.com/Schmavery/facebook-chat-api/issues.",
-                            detail: err,
-                            res: v.delta,
-                            type: "parse_error"
-                          });
-                        }
-                        return (!ctx.globalOptions.selfListen &&
-                            formattedEvent.author.toString() === ctx.userID) ||
-                          !ctx.loggedIn ?
-                          undefined :
-                          globalCallback(null, formattedEvent);
+                    case "ThreadName":
+                    case "ParticipantsAddedToGroupThread":
+                    case "ParticipantLeftGroupThread":
+                      var formattedEvent;
+                      try {
+                        formattedEvent = utils.formatDeltaEvent(v.delta);
+                      } catch (err) {
+                        return globalCallback({
+                          error: "Problem parsing message object. Please open an issue at https://github.com/Schmavery/facebook-chat-api/issues.",
+                          detail: err,
+                          res: v.delta,
+                          type: "parse_error"
+                        });
+                      }
+                      return (!ctx.globalOptions.selfListen &&
+                        formattedEvent.author.toString() === ctx.userID) ||
+                        !ctx.loggedIn ?
+                        undefined :
+                        globalCallback(null, formattedEvent);
                   }
 
                   break;
