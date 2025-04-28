@@ -30,6 +30,7 @@ const RAW_RUNTIME_STATE =
           ["axios", "npm:1.8.2"],\
           ["bluebird", "npm:3.7.2"],\
           ["cheerio", "npm:0.22.0"],\
+          ["dotenv", "npm:16.5.0"],\
           ["eslint", "npm:4.19.1"],\
           ["mocha", "npm:7.2.0"],\
           ["mqtt", "npm:3.0.0"],\
@@ -1283,6 +1284,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["dotenv", [\
+      ["npm:16.5.0", {\
+        "packageLocation": "../../.yarn/berry/cache/dotenv-npm-16.5.0-67343a179e-10c0.zip/node_modules/dotenv/",\
+        "packageDependencies": [\
+          ["dotenv", "npm:16.5.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["dunder-proto", [\
       ["npm:1.0.1", {\
         "packageLocation": "../../.yarn/berry/cache/dunder-proto-npm-1.0.1-90eb6829db-10c0.zip/node_modules/dunder-proto/",\
@@ -1842,6 +1852,7 @@ const RAW_RUNTIME_STATE =
           ["axios", "npm:1.8.2"],\
           ["bluebird", "npm:3.7.2"],\
           ["cheerio", "npm:0.22.0"],\
+          ["dotenv", "npm:16.5.0"],\
           ["eslint", "npm:4.19.1"],\
           ["mocha", "npm:7.2.0"],\
           ["mqtt", "npm:3.0.0"],\
