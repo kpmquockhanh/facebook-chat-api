@@ -1,21 +1,9 @@
 const fs = require("fs");
 const login = require('./src/index.js');
-const axios = require('axios');
-const endpoint = 'http://192.168.0.3:1234/v1/chat/completions';
+require('dotenv').config();
+const { ENABLE_IDS } = process.env;
 var log = require("npmlog");
-async function getLLMResponse(prompt) {
-  try {
-    log.info('get llm response', prompt, endpoint);
-    const response = await axios.post(endpoint, {
-      messages: [{ role: 'user', content: prompt }]
-    });
-
-    console.log('OpenAI Response:', response.data.choices);
-    return response.data.choices[0].message.content;
-  } catch (error) {
-    console.error('Error:', error.response ? error.response.data : error.message);
-  }
-}
+const { getLLMResponse } = require("./src/utils/llm.js");
 
 login({ appState: JSON.parse(fs.readFileSync('appstate.json', 'utf8')) }, (err, api) => {
   if (err) return console.error(err);
@@ -29,11 +17,13 @@ login({ appState: JSON.parse(fs.readFileSync('appstate.json', 'utf8')) }, (err, 
     switch (event.type) {
       case "message":
         log.info('message', event)
+        // Require to startsWith /ask
         if (!event.body || !event.body.startsWith("/ask ")) {
           break;
         }
 
-        if (event.threadID != '2445307828897904' && event.threadID != '100005626272853') {
+        // Only reply by allowed ids
+        if (!ENABLE_IDS.split(',').includes(event.threadID + '')) {
           break;
         }
         api.markAsRead(event.threadID, (err) => {
@@ -49,6 +39,8 @@ login({ appState: JSON.parse(fs.readFileSync('appstate.json', 'utf8')) }, (err, 
             response = 'Server error';
           }
           api.sendMessage("BOT: " + response, event.threadID);
+        }).catch((e) => {
+          log.error(`Error when request llm`, e)
         });
 
         break;

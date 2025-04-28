@@ -59,7 +59,7 @@ function buildAPI(globalOptions, html, jar) {
   }
 
   var userID = maybeCookie[0].cookieString().split("=")[1].toString();
-  log.info("login", "Logged in");
+  log.info("login", "Logged in with ID " + userID);
 
   var clientID = (Math.random() * 2147483648 | 0).toString(16);
 
@@ -347,6 +347,7 @@ function loginHelper(appState, email, password, globalOptions, callback) {
     })
     .then(function(res) {
       var html = res.body;
+      log.info('Just debug', html)
       var stuff = buildAPI(globalOptions, html, jar);
       ctx = stuff[0];
       defaultFuncs = stuff[1];
